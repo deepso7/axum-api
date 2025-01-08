@@ -30,6 +30,10 @@ async fn main() -> Result<()> {
         .merge(routes_hello())
         .nest("/api", routes_apis)
         .merge(web::routes_login::routes())
+        .layer(middleware::from_fn_with_state(
+            mc.clone(),
+            web::mw_auth::mw_ctx_resolver,
+        ))
         .layer(middleware::map_response(main_response_mapper))
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
